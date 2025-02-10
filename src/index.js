@@ -1,4 +1,4 @@
-import { render } from "./virtualDom.js";
+import { diffAlgo, render } from "./virtualDom.js";
 
 let btn = document.getElementById("btn");
 
@@ -11,5 +11,19 @@ const vNode = {
   children: "Print something",
 };
 
-render(vNode);
+const elem = render(vNode);
+// console.log(elem);
 console.log("rendered dom");
+
+const newNode = {
+  type: "h1",
+  props: {
+    id: "heading",
+  },
+  children: "New node change",
+};
+
+const patch = diffAlgo(vNode, newNode);
+
+const type = patch(elem);
+console.log("Updated dom with type ", type);

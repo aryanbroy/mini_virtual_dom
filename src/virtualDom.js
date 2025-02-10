@@ -12,7 +12,7 @@ export function render(virtualNode) {
 
   let { props, children } = virtualNode;
 
-  console.log(virtualNode);
+  // console.log(virtualNode);
 
   Object.entries(props).forEach(([key, val]) => {
     if (key.startsWith("on") && typeof val == "function") {
@@ -37,4 +37,21 @@ export function render(virtualNode) {
 
   const app = document.getElementById("app");
   app.appendChild(element);
+
+  return element;
+}
+
+export function diffAlgo(oldNode, newNode) {
+  let type;
+  if (oldNode.type !== newNode.type) {
+    // replace the whole node
+    type = "REPLACE";
+    return (node) => {
+      // console.log("Old node: ", node);
+      const $newNode = render(newNode);
+      // console.log("New node ", $newNode);
+      node.replaceWith($newNode);
+      return $newNode, type;
+    };
+  }
 }
