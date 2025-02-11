@@ -12,18 +12,26 @@ const vNode = {
 };
 
 const elem = render(vNode);
-// console.log(elem);
 console.log("rendered dom");
 
 const newNode = {
-  type: "h1",
+  type: "button",
   props: {
-    id: "heading",
+    class: "niga",
+    onclick: () => console.log("niga here"),
   },
-  children: "New node change",
+  children: "Print Something",
 };
 
-const patch = diffAlgo(vNode, newNode);
+const patch = diffAlgo(vNode, newNode, elem);
 
-const type = patch(elem);
-console.log("Updated dom with type ", type);
+console.log(patch);
+
+if (typeof patch == "function") {
+  const type = patch(elem);
+  console.log("Updated dom with type ", type);
+}
+
+if (typeof patch == "string") {
+  console.log("Updated dom with string type ", patch);
+}
