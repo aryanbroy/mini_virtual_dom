@@ -60,7 +60,7 @@ export function diffAlgo(oldNode, newNode, element) {
       if (key.startsWith("on")) {
         removedTypes.push(`REMOVE EVENT LISTENER ${key}`);
         const event = key.slice(2).toLowerCase();
-        const callback = newNode.props[key];
+        const callback = oldNode.props[key];
         element.removeEventListener(event, callback);
       } else if (typeof key == "string") {
         removedTypes.push(`REMOVE ATTRIBUTE ${key}`);
