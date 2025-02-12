@@ -1,13 +1,14 @@
-export function VirtualNode(type, props, children) {
+export function VirtualNode(type, props, ...children) {
   return {
     type,
     props: props || {},
     // children: children.flat || [],
-    children: children,
+    children: children || [],
   };
 }
 
 export function render(virtualNode) {
+  console.log(virtualNode);
   const element = document.createElement(virtualNode.type);
 
   let { props, children } = virtualNode;
@@ -22,18 +23,25 @@ export function render(virtualNode) {
     }
   });
 
-  // children.forEach((child) => {
-  //   if (typeof child == "string" || typeof child == "number") {
-  //     const textNode = document.createTextNode(child);
-  //     element.appendChild(textNode);
-  //   } else {
-  //     render(child);
-  //   }
-  // });
+  // multiple child
+  //loop through each child
+  // if the child is a string or number
+  // create a text node
+  // append the text node to the element
+  // if it is another createElement call render again
+
+  children.forEach((child) => {
+    if (typeof child == "string" || typeof child == "number") {
+      const textNode = document.createTextNode(child);
+      element.appendChild(textNode);
+    } else {
+      render(child);
+    }
+  });
 
   // we assume that there is a single child
-  const textNode = document.createTextNode(children);
-  element.appendChild(textNode);
+  // const textNode = document.createTextNode(children);
+  // element.appendChild(textNode);
 
   const app = document.getElementById("app");
   app.appendChild(element);
@@ -54,6 +62,8 @@ export function diffAlgo(oldNode, newNode, element) {
       return $newNode, type;
     };
   }
+
+  // props change
 
   Object.keys(oldNode.props).forEach((key) => {
     if (oldNode.props[key] !== newNode.props[key]) {
@@ -86,6 +96,13 @@ export function diffAlgo(oldNode, newNode, element) {
     }
   });
 
-  console.log(removedTypes);
+  // children change
+
+  if (oldNode.children !== newNode.children) {
+    type.push("REPLACE CHILD");
+    element.innerText = newNode.children;
+  }
+
+  // console.log(removedTypes);
   return type;
 }
