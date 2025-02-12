@@ -7,44 +7,29 @@ export function VirtualNode(type, props, ...children) {
   };
 }
 
-export function render(virtualNode) {
-  console.log(virtualNode);
+export function render(virtualNode, rootElem) {
   const element = document.createElement(virtualNode.type);
 
   let { props, children } = virtualNode;
 
-  // console.log(virtualNode);
-
   Object.entries(props).forEach(([key, val]) => {
     if (key.startsWith("on") && typeof val == "function") {
       element.addEventListener(key.slice(2).toLowerCase(), val);
-    } else {
+    } else if (typeof key == "string") {
       element.setAttribute(key, val);
     }
   });
-
-  // multiple child
-  //loop through each child
-  // if the child is a string or number
-  // create a text node
-  // append the text node to the element
-  // if it is another createElement call render again
 
   children.forEach((child) => {
     if (typeof child == "string" || typeof child == "number") {
       const textNode = document.createTextNode(child);
       element.appendChild(textNode);
     } else {
-      render(child);
+      render(child, element);
     }
   });
 
-  // we assume that there is a single child
-  // const textNode = document.createTextNode(children);
-  // element.appendChild(textNode);
-
-  const app = document.getElementById("app");
-  app.appendChild(element);
+  rootElem.appendChild(element);
 
   return element;
 }
@@ -98,10 +83,25 @@ export function diffAlgo(oldNode, newNode, element) {
 
   // children change
 
-  if (oldNode.children !== newNode.children) {
-    type.push("REPLACE CHILD");
-    element.innerText = newNode.children;
+  let oldChildren = oldNode.children || [];
+  let newChildren = newNode.children || [];
+
+  if (oldChildren.length > newChildren.length) {
+    type.push("REMOVING CHILD NODE");
+    for (let i = newChildren.length; i < oldChildren.length; i++) {
+      element.removeChild(element.childNodes[newChildren.length]);
+    }
   }
+
+  newNode.children.forEach((child) => {
+    if (typeof child == "string" || typeof child == "number") {
+      type.push("CHANGING CHILD STRING");
+      element.innerText = child;
+    } else {
+      type.push("CHANGING CHILD NODE");
+      element.appendChild(render(child, element));
+    }
+  });
 
   // console.log(removedTypes);
   return type;
